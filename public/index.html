@@ -1,81 +1,80 @@
 <!doctype html>
 
-<!-- ASSIGN OUR ANGULAR MODULE -->
 <html ng-app="app">
 
 <head>
-	<!-- META -->
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- Optimize mobile viewport -->
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
-	<link rel="stylesheet" href="css/styles.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 
-	<title>Node/Angular Todo App</title>
-
-	<style>
-		html {
-			overflow-y: scroll;
-		}
-		
-		body {
-			padding-top: 50px;
-		}
-		
-		#todo-list {
-			margin-bottom: 30px;
-		}
-		
-		#todo-form {
-			margin-bottom: 50px;
-		}
-	</style>
-
-
+    <title>Timesheet Entry</title>
 </head>
 
 <body ng-controller="mainCtrl as vm">
-	<section layout="column" layout-align="center center">
-		<h2>Week Selection</h2>
-		<p>Use current week for timesheet entry?</p>
-		<div layout="row" layout-align="none center">
-			<md-switch ng-model="vm.useCurrentWeek" aria-label="Finished?">
-			</md-switch>
-			<strong ng-bind="vm.useCurrentWeek ? 'Yes' : 'No'"></strong>
-		</div>
+    <section layout="column" layout-align="center center">
+        <h2>Week Selection</h2>
+        <p>Use current week for timesheet entry?</p>
+        <div layout="row" layout-align="none center">
+            <md-switch ng-model="vm.useCurrentWeek" aria-label="Finished?">
+            </md-switch>
+            <strong ng-bind="vm.useCurrentWeek ? 'Yes' : 'No'"></strong>
+        </div>
 
-		<form name="formWeekSelection" novalidate>
-			<div ng-if="!vm.useCurrentWeek">
-				<p>Please select a date to find the week to use for your timesheet:</p>
-				<md-datepicker ng-model="vm.datePicker" ng-change="vm.onDateSelected()"></md-datepicker>
-			</div>
+        <form name="formWeekSelection" novalidate>
+            <div ng-if="!vm.useCurrentWeek">
+                <p>Please select a date to find the week to use for your timesheet:</p>
+                <md-datepicker ng-model="vm.datePicker" ng-change="vm.onDateSelected()"></md-datepicker>
+            </div>
 
-			<md-button class="md-primary">Next</md-button>
-		</form>
+            <md-button class="md-primary">Next</md-button>
+        </form>
 
-		<section id="data-entry-container">
-			<h2>Data Entry</h2>
-			<div id="dates-container">
-				<div ng-repeat="entry in vm.dataEntryCollection">
-					<div>{{ entry.format('dddd, Do MMM YYYY') }}</div>
-				</div>
-			</div>
-		</section>
+        <section id="data-entry-container">
+            <h2>Data Entry</h2>
+            <div id="dates-container">
+                <div ng-repeat="entry in vm.dataEntryCollection">
+                    <p>{{ entry.date.format('dddd') }}</p>
+                    <p>{{ entry.date.format('Do MMM YYYY') }}</p>
+                    <form name="timeEntryForm">
+                        <md-select placeholder="Select project" ng-model="entry.tempProject" name="proj">
+                            <md-option ng-repeat="project in vm.projects" ng-value="project">{{ project}}</md-option>
+                        </md-select>
+                        <div class="time-entry-container">
+                            <md-select placeholder="Select hour" ng-model="entry.tempHour" name="hours">
+                                <md-option ng-repeat="hour in vm.hours" ng-value="hour">{{hour}}</md-option>
+                            </md-select>
+                            <md-select placeholder="Select minute" ng-model="entry.tempMinute" name="minutes">
+                                <md-option ng-repeat="minute in vm.minutes" ng-value="minute">{{ minute }}</md-option>
+                            </md-select>
+                        </div>
+                        <button type="button" class="md-primary md-button" ng-click="vm.addProjectData(timeEntryForm, entry)">
+							Add
+						</button>
 
-	</section>
+                        <div ng-repeat="projectData in entry.projectDataItems">
+                            <div>{{ projectData.project }}</div>
+                            <div>{{ projectData.time }}</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <button type="button" class="md-button md-accent" ng-click="vm.submit()">Submit</button>
+        </section>
 
+    </section>
 
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
 
-	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <script src="lib/moment.js"></script>
 
-	<script src="lib/moment.js"></script>
-
-	<script src="core.js"></script>
+    <script src="core.js"></script>
 </body>
 
 </html>
